@@ -4,7 +4,7 @@ open System
 
     [<RequireQualifiedAccess>]
     module Domain = 
-        
+        exception UnsuppotedException of string
         type Application = {Name : string}
         type Secret = {Application : Application ; Token : string ; CreatedOn : DateTime ; ExpiryOn : DateTime}
         

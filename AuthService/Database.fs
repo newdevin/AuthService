@@ -42,7 +42,7 @@ module Database =
                 |>Seq.tryHeadAsync
 
             if Option.isNone(app) then
-                failwith (sprintf "'%s' is not supported" secret.Application.Name)
+                raise ( Domain.UnsuppotedException (sprintf "'%s' is not supported" secret.Application.Name))
 
             return app
                 |> Option.map (fun a -> 
