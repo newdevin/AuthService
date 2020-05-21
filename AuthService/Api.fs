@@ -1,14 +1,16 @@
 ﻿namespace AuthService
 
 open Saturn
+open Giraffe
+open FSharp.Control.Tasks.V2
 
 [<RequireQualifiedAccess>]
 module Api = 
     let getToken appName = 
-        async{
+        task {
             try
                 let! token = Service.getToken appName
-                return Ok (token)
+                return Successful.OK token
             with 
-                | Domain.UnsuppotedException s -> return BadRequest
+                | Domain.UnsuppotedException s -> return setStatusCode 400 
         }
