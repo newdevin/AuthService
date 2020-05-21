@@ -1,6 +1,6 @@
 ﻿namespace AuthService
 open Saturn
-open FSharp.Control.Tasks.V2
+open FSharp.Control.Tasks.V2.ContextInsensitive
 open Giraffe
 
 module Router = 
@@ -9,8 +9,9 @@ module Router =
         
         getf "/api/%s" (fun name next ctx  ->  
             task {
-                let! token = Service.getToken name
-                return! json token next ctx
+                return! json (Api.getToken name) next ctx
+                //let! token = Api.getToken name
+                //return! json token next ctx
             }
         )
     }

@@ -12,6 +12,18 @@ module Database =
 
     let options:TransactionOptions = { IsolationLevel = IsolationLevel.DontCreateTransaction ; Timeout = TimeSpan.FromSeconds(15.0)}
 
+    let isValidApplication appName = 
+        async {
+            let ctx = Authdb.GetDataContext(options);
+            let! qry = 
+                query {
+                    for app in ctx.Dbo.Application do
+                    where (app.Name = appName)
+                }|> Seq.tryHeadAsync
+            
+            return qry |> Option.map (fun a -> true)
+        }
+
     let getToken appName =
         async {
             let ctx = Authdb.GetDataContext(options);
@@ -42,15 +54,17 @@ module Database =
                 |>Seq.tryHeadAsync
 
             if Option.isNone(app) then
-                raise ( Domain.UnsuppotedException (sprintf "'%s' is not supported" secret.Application.Name))
+                let msg = sprintf "'%s' is not supported" secret.Application.Name
+                raise ( Domain.UnsuppotedException msg)
 
             return app
                 |> Option.map (fun a -> 
-                    let newSecret = ctx.Dbo.Secret.``Create(ApplicationId, CreatedOn, ExpiryOn, Token)``(a.Id, secret.CreatedOn, secret.ExpiryOn, secret.Token)
-                    async{
-                        do! ctx.SubmitUpdatesAsync()
-                    }|> ignore
-                    Domain.createSecret secret.Application.Name newSecret.Token newSecret.CreatedOn newSecret.ExpiryOn)
+                   let newSecret = ctx.Dbo.Secret.``Create(ApplicationId, CreatedOn, ExpiryOn, Token)``(a.Id, secret.CreatedOn, secret.ExpiryOn, secret.Token)
+                   let a = async {
+                            do! ctx.SubmitUpdatesAsync()
+                           }
+                   Async.RunSynchronously a
+                   Domain.createSecret secret.Application.Name newSecret.Token newSecret.CreatedOn newSecret.ExpiryOn)
         }
 
 

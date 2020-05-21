@@ -8,7 +8,7 @@ module Api =
         async {
             try
                 let! token = Service.getToken appName
-                return Successful.OK token
+                return (Successful.OK token )
             with 
-                | Domain.UnsuppotedException s -> return setStatusCode 400 
+                | Domain.UnsuppotedException s -> return (RequestErrors.BAD_REQUEST (text s) )
         }
