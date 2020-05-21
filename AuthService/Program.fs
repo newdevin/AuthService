@@ -5,11 +5,16 @@ open Saturn
 open Giraffe
 open AuthService
 
+let api = pipeline {
+    plug acceptJson
+    set_header "x-pipeline-type" "Api"
+}
 
 let app = application {
-
-    url "https://0.0.0.0:8085" 
-    force_ssl
+   // pipe_through api
+    url "https://0.0.0.0:8085/" 
+    url "http://0.0.0.0:8086/"
+    //force_ssl
     use_router Router.apiRouter
 }
 

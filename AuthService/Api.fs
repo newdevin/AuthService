@@ -1,14 +1,17 @@
 ﻿namespace AuthService
 
 open Giraffe
+open Microsoft.AspNetCore.Http
+open FSharp.Control.Tasks.V2.ContextInsensitive
+
 
 [<RequireQualifiedAccess>]
 module Api = 
-    let getToken appName = 
-        async {
-            try
-                let! token = Service.getToken appName
-                return (Successful.OK token )
-            with 
-                | Domain.UnsuppotedException s -> return (RequestErrors.BAD_REQUEST (text s) )
+    let getToken appName : HttpHandler = fun (next : HttpFunc) (ctx : HttpContext) ->
+        task {
+            let! tokenString = Service.getToken appName
+            match tokenString with
+            | None -> return! (RequestErrors.NOT_FOUND "404") next ctx
+            | Some v -> let t:Models.Token = {Token = v } 
+                        return! (Successful.OK t ) next ctx
         }

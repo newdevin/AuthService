@@ -53,10 +53,6 @@ module Database =
                 }
                 |>Seq.tryHeadAsync
 
-            if Option.isNone(app) then
-                let msg = sprintf "'%s' is not supported" secret.Application.Name
-                raise ( Domain.UnsuppotedException msg)
-
             return app
                 |> Option.map (fun a -> 
                    let newSecret = ctx.Dbo.Secret.``Create(ApplicationId, CreatedOn, ExpiryOn, Token)``(a.Id, secret.CreatedOn, secret.ExpiryOn, secret.Token)
