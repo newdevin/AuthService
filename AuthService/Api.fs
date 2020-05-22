@@ -3,7 +3,7 @@
 open Giraffe
 open Microsoft.AspNetCore.Http
 open FSharp.Control.Tasks.V2.ContextInsensitive
-
+open System
 
 [<RequireQualifiedAccess>]
 module Api = 

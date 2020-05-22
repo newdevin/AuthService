@@ -16,30 +16,26 @@ module Database =
         let ctx = Authdb.GetDataContext()
         query {
             for sec in ctx.Dbo.SecretKey do
-            select (sec.Key , sec.Iv)
-            head
+            select (Convert.FromBase64String sec.Key , Convert.FromBase64String sec.Iv)
         }
+        |> Seq.headAsync
         
 
-    let getToken appName appId =
+    let getToken appName =
         async {
             let ctx = Authdb.GetDataContext(options);
-            let! result = 
+            return!
                 query {
                     for secret in ctx.Dbo.Secret do
                     join application in ctx.Dbo.Application 
                         on (secret.ApplicationId = application.Id)
-                    where (application.Name = appName && application.AppId = appId)
-                    select (secret, application)
+                    where (application.Name = appName )
+                    select (secret.Token)
                 }
-                |> Seq.tryHeadAsync  
-
-            return result 
-                    |> Option.map (fun (s,a) -> Domain.createSecret a.Name a.AppId s.Token s.CreatedOn s.ExpiryOn )
-
+                |> Seq.tryHeadAsync
         } 
 
-    let createToken (secret : Domain.Secret) = 
+    let createToken (secret : Domain.Secret) token = 
         async {
             let ctx = Authdb.GetDataContext (options)
             let! app = 
@@ -52,12 +48,14 @@ module Database =
 
             return app
                 |> Option.map (fun a -> 
-                   let newSecret = ctx.Dbo.Secret.``Create(ApplicationId, CreatedOn, ExpiryOn, Token)``(a.Id, secret.CreatedOn, secret.ExpiryOn, secret.Token)
+                   let newSecret = ctx.Dbo.Secret.``Create(ApplicationId, CreatedOn, ExpiryOn, Token)``(a.Id, secret.CreatedOn, secret.ExpiryOn, token)
                    let a = async {
                             do! ctx.SubmitUpdatesAsync()
                            }
                    Async.RunSynchronously a
-                   Domain.createSecret secret.Application.Name secret.Application.Id newSecret.Token newSecret.CreatedOn newSecret.ExpiryOn)
+                   token
+                   )
         }
 
+    
 

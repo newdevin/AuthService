@@ -1,31 +1,52 @@
 ﻿namespace AuthService
     open System
+    
 
+    module TokenService = 
+        let createToken key iv (secret:Domain.Secret) = 
+            sprintf "%s;%A" secret.Application.Name secret.Application.Id
+            |> Crypto.encrypt key iv
+
+        let verifyToken key iv token applicationName applicationId =
+            let token = Crypto.decrypt key iv token
+            let appName = token.Split(";") |> Array.head
+            let appId = token.Split(";") |> Array.tail |> Array.head |> Guid.Parse
+            appName = applicationName && appId = applicationId
+    
     module Service = 
         
-        let private generateToken applicationName (applicationId:Guid) (createDate:DateTime) (expiryDate:DateTime) key iv = 
-            sprintf "appName:%s;appId:%A;createDate:%s;expiryDate:%s" applicationName applicationId (createDate.ToString "yyyy-MM-dd hh:mm") (expiryDate.ToString "yyyy-MM-dd hh:mm")
-            |> Crypto.encrypt key iv 
-
-        let private createSecret applicationName applicationId key iv = 
+        let private createSecret applicationName applicationId = 
             let createDate = DateTime.Now
             let expiryDate = createDate.AddDays(7.)
-            let token = generateToken applicationName applicationId createDate expiryDate key iv
-            Domain.createSecret applicationName applicationId token createDate expiryDate
+            Domain.createSecret applicationName applicationId createDate expiryDate
 
         let getToken applicationName applicationId = 
             async {
-                
-                let! secret = Database.getToken applicationName applicationId
-
-                match secret with
-                | Some s -> return Some s.Token
+                let! token = Database.getToken applicationName 
+                match token with
+                | Some s -> let! key,iv = Database.getSecretKey
+                            let verified = TokenService.verifyToken key iv s applicationName applicationId
+                            match verified with
+                            | true -> return Some s
+                            | false -> return None
                 | None -> return! 
                             async{
-                            let key,iv = Database.getSecretKey
-                            let! p = createSecret applicationName applicationId (Convert.FromBase64String key) ( Convert.FromBase64String iv)
-                                     |> Database.createToken
-                            return p |> Option.map (fun s -> s.Token)
+                                let! key,iv = Database.getSecretKey
+                                let secret = createSecret applicationName applicationId 
+                                let token = TokenService.createToken key iv secret
+                                let! r = Database.createToken secret token
+                                return r
+                                   |> Option.map (fun t -> t)
                           }             
             }
+
+        //let verifyToken applicationName token =  // verify application name and not expired
+        //    async {
+                
+        //    }
+
+    
+
+
+
 
