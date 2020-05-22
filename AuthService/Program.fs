@@ -4,6 +4,9 @@ open System
 open Saturn
 open Giraffe
 open AuthService
+open Microsoft.Extensions.Configuration
+
+
 
 
 let app = application {

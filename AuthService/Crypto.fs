@@ -23,8 +23,10 @@ module Crypto =
             use swEncrypt = new StreamWriter(csEncrypt)
             swEncrypt.Write(data)
         )
-        msEncrypt.ToArray()
-        |> Convert.ToBase64String 
+        let s = msEncrypt.ToArray()
+                |> Convert.ToBase64String 
+        s.Replace("+","_").Replace("/","_")
+        
         
 
     let decrypt (key:byte[]) (iv:byte[]) (encryptedData:string) = 

@@ -3,8 +3,8 @@
 [<RequireQualifiedAccess>]
 module Models = 
     [<CLIMutable>]
-    type Token = {Token :string}
+    type Token = {TokenString :string}
 
     [<CLIMutable>]
-    type ErrorMessage = {Message : string} 
+    type TokenVerification = {Verified: bool} 
 

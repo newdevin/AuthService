@@ -40,10 +40,11 @@
                           }             
             }
 
-        //let verifyToken applicationName token =  // verify application name and not expired
-        //    async {
-                
-        //    }
+        let verifyToken applicationName token =  // verify application name and not expired
+            async {
+                let! savedToken = Database.getToken applicationName
+                return savedToken |> Option.map( fun t -> t = token)
+            }
 
     
 
