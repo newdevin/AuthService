@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Crypto.fs" />
     <Compile Include="Models.fs" />
     <Content Include="appSettings.json" />
     <None Include="Db.sql" />

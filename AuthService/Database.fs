@@ -12,19 +12,16 @@ module Database =
 
     let options:TransactionOptions = { IsolationLevel = IsolationLevel.DontCreateTransaction ; Timeout = TimeSpan.FromSeconds(15.0)}
 
-    let isValidApplication appName = 
-        async {
-            let ctx = Authdb.GetDataContext(options);
-            let! qry = 
-                query {
-                    for app in ctx.Dbo.Application do
-                    where (app.Name = appName)
-                }|> Seq.tryHeadAsync
-            
-            return qry |> Option.map (fun a -> true)
+    let getSecretKey = 
+        let ctx = Authdb.GetDataContext()
+        query {
+            for sec in ctx.Dbo.SecretKey do
+            select (sec.Key , sec.Iv)
+            head
         }
+        
 
-    let getToken appName =
+    let getToken appName appId =
         async {
             let ctx = Authdb.GetDataContext(options);
             let! result = 
@@ -32,13 +29,13 @@ module Database =
                     for secret in ctx.Dbo.Secret do
                     join application in ctx.Dbo.Application 
                         on (secret.ApplicationId = application.Id)
-                    where (application.Name = appName )
+                    where (application.Name = appName && application.AppId = appId)
                     select (secret, application)
                 }
                 |> Seq.tryHeadAsync  
 
             return result 
-                    |> Option.map (fun (s,a) -> Domain.createSecret a.Name s.Token s.CreatedOn s.ExpiryOn )
+                    |> Option.map (fun (s,a) -> Domain.createSecret a.Name a.AppId s.Token s.CreatedOn s.ExpiryOn )
 
         } 
 
@@ -60,7 +57,7 @@ module Database =
                             do! ctx.SubmitUpdatesAsync()
                            }
                    Async.RunSynchronously a
-                   Domain.createSecret secret.Application.Name newSecret.Token newSecret.CreatedOn newSecret.ExpiryOn)
+                   Domain.createSecret secret.Application.Name secret.Application.Id newSecret.Token newSecret.CreatedOn newSecret.ExpiryOn)
         }
 
 

@@ -7,9 +7,9 @@ open FSharp.Control.Tasks.V2.ContextInsensitive
 
 [<RequireQualifiedAccess>]
 module Api = 
-    let getToken appName : HttpHandler = fun (next : HttpFunc) (ctx : HttpContext) ->
+    let getToken appName appId : HttpHandler = fun (next : HttpFunc) (ctx : HttpContext) ->
         task {
-            let! tokenString = Service.getToken appName
+            let! tokenString = Service.getToken appName appId
             match tokenString with
             | None -> return! (RequestErrors.NOT_FOUND "404") next ctx
             | Some v -> let t:Models.Token = {Token = v } 
