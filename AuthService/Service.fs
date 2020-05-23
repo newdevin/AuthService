@@ -3,8 +3,8 @@
     
 
     module TokenService = 
-        let createToken key iv (secret:Domain.Secret) = 
-            sprintf "%s;%A" secret.Application.Name secret.Application.Id
+        let createToken key iv appName appId = 
+            sprintf "%s;%A" appName appId
             |> Crypto.encrypt key iv
 
         let verifyToken key iv token applicationName applicationId =
@@ -15,39 +15,52 @@
     
     module Service = 
         
-        let private createSecret applicationName applicationId = 
+        let private createSecret applicationName applicationId token = 
             let createDate = DateTime.Now
             let expiryDate = createDate.AddDays(7.)
-            Domain.createSecret applicationName applicationId createDate expiryDate
+            Domain.createSecret applicationName applicationId token createDate expiryDate
+
+        let private createToken applicationName applicationId = 
+            async {
+                let! key,iv = Database.getSecretKey
+                let token = TokenService.createToken key iv applicationName applicationId
+                let secret = createSecret applicationName applicationId token
+                let! x = Database.deleteToken applicationName
+                x |> ignore
+                let! r = Database.createToken secret
+                return r |> Option.map(fun t -> t.Token)
+                }
+
+        let private verifySecretToken (secret:Domain.Secret) applicationName applicationId = 
+            async {
+                if secret.ExpiryOn <= DateTime.Now then
+                    return false
+                else
+                    let! key,iv = Database.getSecretKey
+                    let verified = TokenService.verifyToken key iv secret.Token applicationName applicationId
+                    match verified with
+                    | true -> return true
+                    | false -> return false
+            }
 
         let getToken applicationName applicationId = 
             async {
-                let! token = Database.getToken applicationName 
-                match token with
-                | Some s -> let! key,iv = Database.getSecretKey
-                            let verified = TokenService.verifyToken key iv s applicationName applicationId
+                let! secret = Database.getSecret applicationName
+                match secret with
+                | Some s -> let! verified = verifySecretToken s applicationName applicationId
                             match verified with
-                            | true -> return Some s
-                            | false -> return None
-                | None -> return! 
-                            async{
-                                let! key,iv = Database.getSecretKey
-                                let secret = createSecret applicationName applicationId 
-                                let token = TokenService.createToken key iv secret
-                                let! r = Database.createToken secret token
-                                return r
-                                   |> Option.map (fun t -> t)
-                          }             
+                            | true -> return Some s.Token
+                            | false -> return! createToken applicationName applicationId
+                | None -> return! createToken applicationName applicationId
             }
 
-        let verifyToken applicationName token =  // verify application name and not expired
+        let verifyToken applicationName token =  
             async {
-                let! savedToken = Database.getToken applicationName
-                return savedToken |> Option.map( fun t -> t = token)
+                let! secret = Database.getSecret applicationName
+                match secret with
+                | None -> return false
+                | Some s -> if s.Token <> token then 
+                                return false 
+                            else 
+                                return! verifySecretToken s applicationName s.Application.Id
             }
-
-    
-
-
-
-

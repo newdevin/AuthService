@@ -25,12 +25,13 @@ module Crypto =
         )
         let s = msEncrypt.ToArray()
                 |> Convert.ToBase64String 
-        s.Replace("+","_").Replace("/","_")
+        s.Replace("+","_").Replace("/","-")
         
         
 
     let decrypt (key:byte[]) (iv:byte[]) (encryptedData:string) = 
-        let data = Convert.FromBase64String(encryptedData)
+        let enc = encryptedData.Replace("_","+").Replace("-","/")
+        let data = Convert.FromBase64String(enc)
         use aesAlg = Aes.Create()
         aesAlg.Key <- key
         aesAlg.IV <- iv

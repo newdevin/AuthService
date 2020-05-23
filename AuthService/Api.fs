@@ -20,8 +20,8 @@ module Api =
         task {
             let! verified = Service.verifyToken appName (token)
             match verified with
-            | Some t -> let verification:Models.TokenVerification = {Verified = t}
-                        return! (Successful.OK verification) next ctx
-            | None -> let verification:Models.TokenVerification = {Verified = false}
+            | true -> let verification:Models.TokenVerification = {Verified = true}
                       return! (Successful.OK verification) next ctx
+            | false -> let verification:Models.TokenVerification = {Verified = false}
+                       return! (Successful.OK verification) next ctx
         }
