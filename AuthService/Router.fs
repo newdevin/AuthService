@@ -8,8 +8,12 @@ module Router =
     let apiRouter = router {
         
         get "/api" (text "Hello world")
-        getf "/api/token/%s/%s" (fun nameAndId -> let name, id = nameAndId 
-                                                  Api.getToken name (Guid.Parse id))
+        getf "/api/token/%s/%s" (fun nameAndId -> let name, id = nameAndId
+                                                  let valid, guid = Guid.TryParse id
+                                                  if not valid then
+                                                    RequestErrors.badRequest (text "bad request")
+                                                  else
+                                                    Api.getToken name guid)
         getf "/api/verify/%s/%s" (fun nameAndToken -> let name, token = nameAndToken 
                                                       Api.verifyToken name token)
     }
