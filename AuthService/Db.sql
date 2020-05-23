@@ -1,6 +1,6 @@
 ﻿USE [master]
 GO
-/****** Object:  Database [Auth]    Script Date: 20/05/2020 15:18:35 ******/
+/****** Object:  Database [Auth]    Script Date: 23/05/2020 20:55:47 ******/
 CREATE DATABASE [Auth]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -79,7 +79,7 @@ ALTER DATABASE [Auth] SET QUERY_STORE = OFF
 GO
 USE [Auth]
 GO
-/****** Object:  Table [dbo].[Application]    Script Date: 20/05/2020 15:18:36 ******/
+/****** Object:  Table [dbo].[Application]    Script Date: 23/05/2020 20:55:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -87,11 +87,12 @@ GO
 CREATE TABLE [dbo].[Application](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](64) NOT NULL,
-PRIMARY KEY CLUSTERED 
+	[AppId] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK__Applicat__3214EC0718795AFA] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
-UNIQUE NONCLUSTERED 
+ CONSTRAINT [UQ__Applicat__737584F68A0E426F] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
@@ -101,7 +102,7 @@ UNIQUE NONCLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Secret]    Script Date: 20/05/2020 15:18:36 ******/
+/****** Object:  Table [dbo].[Secret]    Script Date: 23/05/2020 20:55:48 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -122,22 +123,27 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SecretKey]    Script Date: 20/05/2020 15:18:36 ******/
+/****** Object:  Table [dbo].[SecretKey]    Script Date: 23/05/2020 20:55:48 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[SecretKey](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Key] [nvarchar](1024) NOT NULL,
+	[Key] [nvarchar](64) NOT NULL,
+	[IV] [nvarchar](32) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[Secret]  WITH CHECK ADD FOREIGN KEY([ApplicationId])
+ALTER TABLE [dbo].[Application] ADD  CONSTRAINT [DF__Applicati__AppId__44FF419A]  DEFAULT (newid()) FOR [AppId]
+GO
+ALTER TABLE [dbo].[Secret]  WITH CHECK ADD  CONSTRAINT [FK__Secret__Applicat__3A81B327] FOREIGN KEY([ApplicationId])
 REFERENCES [dbo].[Application] ([Id])
+GO
+ALTER TABLE [dbo].[Secret] CHECK CONSTRAINT [FK__Secret__Applicat__3A81B327]
 GO
 USE [master]
 GO
