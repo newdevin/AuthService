@@ -11,7 +11,7 @@
             let token = Crypto.decrypt key iv token
             let appName = token.Split(";") |> Array.head
             let appId = token.Split(";") |> Array.tail |> Array.head |> Guid.Parse
-            appName = applicationName && appId = applicationId
+            appName = applicationName && appId = applicationId 
     
     module Service = 
         

@@ -20,19 +20,45 @@ module Database =
         }
         |> Seq.headAsync
         
+    let deleteToken appName = 
+        query {
+                let ctx = Authdb.GetDataContext(options);
+                for secret in ctx.Dbo.Secret do
+                join application in ctx.Dbo.Application 
+                    on (secret.ApplicationId = application.Id)
+                where (application.Name = appName )
+            }
+            |> Seq.``delete all items from single table``
+            |> Async.RunSynchronously
+
+    let getSecret appName = 
+        async {
+            let ctx = Authdb.GetDataContext(options);
+            query {
+                for secret in ctx.Dbo.Secret do
+                    join application in ctx.Dbo.Application 
+                        on (secret.ApplicationId = application.Id)
+                    where (application.Name = appName )
+                    select secret
+            }|> Seq.headAsync
+        }
 
     let getToken appName =
         async {
             let ctx = Authdb.GetDataContext(options);
-            return!
+            let! sec = 
                 query {
                     for secret in ctx.Dbo.Secret do
                     join application in ctx.Dbo.Application 
                         on (secret.ApplicationId = application.Id)
                     where (application.Name = appName )
-                    select (secret.Token)
+                    select secret
                 }
                 |> Seq.tryHeadAsync
+
+            return sec |> Option.map( fun s -> if s.ExpiryOn <= DateTime.Now then
+                                                deleteToken appName |> ignore
+                                               s.Token)
         } 
 
     let createToken (secret : Domain.Secret) token = 
