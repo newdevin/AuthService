@@ -1,6 +1,6 @@
 ﻿USE [master]
 GO
-/****** Object:  Database [Auth]    Script Date: 23/05/2020 20:55:47 ******/
+/****** Object:  Database [Auth]    Script Date: 24/05/2020 23:33:29 ******/
 CREATE DATABASE [Auth]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -79,7 +79,7 @@ ALTER DATABASE [Auth] SET QUERY_STORE = OFF
 GO
 USE [Auth]
 GO
-/****** Object:  Table [dbo].[Application]    Script Date: 23/05/2020 20:55:47 ******/
+/****** Object:  Table [dbo].[Application]    Script Date: 24/05/2020 23:33:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -88,6 +88,7 @@ CREATE TABLE [dbo].[Application](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](64) NOT NULL,
 	[AppId] [uniqueidentifier] NOT NULL,
+	[AppSecret] [uniqueidentifier] NOT NULL,
  CONSTRAINT [PK__Applicat__3214EC0718795AFA] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -102,7 +103,7 @@ CREATE TABLE [dbo].[Application](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Secret]    Script Date: 23/05/2020 20:55:48 ******/
+/****** Object:  Table [dbo].[Secret]    Script Date: 24/05/2020 23:33:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -123,7 +124,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SecretKey]    Script Date: 23/05/2020 20:55:48 ******/
+/****** Object:  Table [dbo].[SecretKey]    Script Date: 24/05/2020 23:33:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -139,6 +140,8 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[Application] ADD  CONSTRAINT [DF__Applicati__AppId__44FF419A]  DEFAULT (newid()) FOR [AppId]
+GO
+ALTER TABLE [dbo].[Application] ADD  DEFAULT (newid()) FOR [AppSecret]
 GO
 ALTER TABLE [dbo].[Secret]  WITH CHECK ADD  CONSTRAINT [FK__Secret__Applicat__3A81B327] FOREIGN KEY([ApplicationId])
 REFERENCES [dbo].[Application] ([Id])
