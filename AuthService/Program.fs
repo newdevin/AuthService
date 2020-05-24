@@ -11,8 +11,9 @@ open Microsoft.Extensions.Configuration
 
 let app = application {
    
+    url "http://0.0.0.0:8086/" 
     url "https://0.0.0.0:8085/" 
-    force_ssl
+    //force_ssl
     use_router Router.apiRouter
     
 }

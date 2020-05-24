@@ -37,14 +37,11 @@ module Database =
                                         where (secret.ApplicationId = id)
                                         select secret
                                     }|> Seq.``delete all items from single table``
+                                    |> Async.RunSynchronously
                          )
             |> ignore
             return appId
         }
-
-         
-         
-
 
     let getSecret appName = 
         async {
@@ -54,7 +51,7 @@ module Database =
                     join application in ctx.Dbo.Application 
                         on (secret.ApplicationId = application.Id)
                     where (application.Name = appName )
-                    select (Domain.createSecret application.Name application.AppId secret.Token secret.CreatedOn secret.ExpiryOn)
+                    select (Domain.createSecret application.Name application.AppId application.AppSecret secret.Token secret.CreatedOn secret.ExpiryOn)
             }|> Seq.tryHeadAsync
         }
 
