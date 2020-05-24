@@ -25,3 +25,13 @@ module Api =
             | false -> let verification:Models.TokenVerification = {Verified = false}
                        return! (Successful.OK verification) next ctx
         }
+
+    let refreshToken appName appId token : HttpHandler = fun (next : HttpFunc) (ctx : HttpContext) ->
+        task {
+            let! token = Service.refreshToken appName appId token
+            match token with
+            | None -> return! (RequestErrors.NOT_FOUND "404") next ctx
+            | Some v -> let t:Models.Token = {TokenString = v } 
+                        return! (Successful.OK t ) next ctx
+
+        }

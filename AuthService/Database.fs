@@ -78,5 +78,24 @@ module Database =
                    )
         }
 
+    let updateApplicationSecret appName appSecret = 
+        async{
+            let ctx = Authdb.GetDataContext (options)
+            let! app = 
+                query {
+                    for app in ctx.Dbo.Application do
+                    where (app.Name = appName)
+                    select app
+                }|> Seq.tryHeadAsync
+
+        match app with
+        | Some a -> a.AppSecret <- appSecret
+                    ctx.SubmitUpdatesAsync()
+                    |> Async.RunSynchronously
+                    return true
+        | None -> return false
+
+        }
+
     
 

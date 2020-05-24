@@ -14,9 +14,9 @@
             if arr.Length <> 3 then
                 false
             else
-                let appName = arr|> Array.head
-                let appId = arr |> Array.tail |> Array.head |> Guid.Parse
-                let appSecret = arr |> Array.tail |>Array.tail |> Array.head |> Guid.Parse
+                let appName = arr.[0] 
+                let appId = arr.[1] |> Guid.Parse
+                let appSecret = arr.[2] |> Guid.Parse
                 appName = applicationName && appId = applicationId  && appSecret = applicationSecret
     
     module Service = 
@@ -69,4 +69,16 @@
                                 return false 
                             else 
                                 return! verifySecretToken s applicationName s.Application.Id s.Application.AppSecret
+            }
+
+        let refreshToken applicationName applicationId token = 
+            async {
+                let! verified = verifyToken applicationName token
+                if verified then
+                    let newSecret = Guid.NewGuid()
+                    let! u = Database.updateApplicationSecret applicationName newSecret
+                    let! token =  createToken applicationName applicationId newSecret
+                    return token
+                else
+                    return None
             }
