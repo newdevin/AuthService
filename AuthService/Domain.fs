@@ -5,7 +5,9 @@ open System
     [<RequireQualifiedAccess>]
     module Domain = 
         
+        [<CLIMutable>]
         type Application = {Name : string ; Id :Guid ; AppSecret : Guid}
+        [<CLIMutable>]
         type Secret = {Application : Application ; Token : string ; CreatedOn : DateTime ; ExpiryOn : DateTime}
         
         let createApplication applicationName applicationId applicationSecret = 

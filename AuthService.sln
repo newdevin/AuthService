@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AuthService", "AuthService\AuthService.fsproj", "{8F4B38A2-6E33-4DBE-8629-0B47651FEF09}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AuthService", "AuthService\AuthService.fsproj", "{8F4B38A2-6E33-4DBE-8629-0B47651FEF09}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FACBC87E-B227-4816-815C-9C52E5073B0F}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		DockerFile = DockerFile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

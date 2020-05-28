@@ -8,7 +8,9 @@
   <ItemGroup>
     <Compile Include="Crypto.fs" />
     <Compile Include="Models.fs" />
-    <Content Include="appSettings.json" />
+    <Content Include="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Db.sql" />
     <Compile Include="Domain.fs" />
     <Compile Include="Database.fs" />
@@ -21,13 +23,14 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="3.3.3" />
     <PackageReference Include="Giraffe" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />
     <PackageReference Include="Saturn" Version="0.13.1" />
     <PackageReference Include="SQLProvider" Version="1.1.87" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.7.1" />
+    <PackageReference Update="FSharp.Core" Version="4.7.2" />
   </ItemGroup>
 
 </Project>
