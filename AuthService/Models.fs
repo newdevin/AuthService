@@ -1,5 +1,7 @@
 ﻿namespace AuthService
 
+open System
+
 [<RequireQualifiedAccess>]
 module Models = 
     [<CLIMutable>]
@@ -7,4 +9,7 @@ module Models =
 
     [<CLIMutable>]
     type TokenVerification = {Verified: bool} 
+
+    [<CLIMutable>]
+    type AppRegistration = {AppId : Guid ; Token : string}
 
