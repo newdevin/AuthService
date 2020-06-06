@@ -24,17 +24,19 @@ open System
             sprintf "%s;%A;%A" appName appId appSecret
             |> Crypto.encrypt secret.Key secret.Iv
 
-        let verifyToken secret app =
-            match app.SecretToken with
-            | None -> false
-            | Some st ->let token = Crypto.decrypt secret.Key secret.Iv st.Token
-                        let arr = token.Split(";");
-                        if arr.Length <> 3 then
-                            false
-                        else
-                            let appName = arr.[0] 
-                            let appId = arr.[1] |> Guid.Parse
-                            let appSecret = arr.[2] |> Guid.Parse
-                            appName = app.Name && appId = app.AppId  && appSecret = app.AppSecret
+        let verifyToken secret appName appId appSecret token =
+            try
+                let token = Crypto.decrypt secret.Key secret.Iv token
+                let arr = token.Split(";");
+                if arr.Length <> 3 then
+                    false
+                else
+                    let name = arr.[0] 
+                    let id = arr.[1] |> Guid.Parse
+                    let secret = arr.[2] |> Guid.Parse
+                    name = appName && id = appId  && secret = appSecret
+            with
+            | _ -> false;
+
         
         

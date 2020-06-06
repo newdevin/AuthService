@@ -28,22 +28,36 @@ module Mongo =
 
     let getApp constr appName = 
         async{
-            let col = getCollection<MongoApp> constr appName
-            let! stream = col.FindAsync(fun app -> app.App.Name = appName) |> Async.AwaitTask 
+            let col = getCollection<MongoApp> constr "App"
+            let! stream = col.FindAsync(fun a -> a.App.Name = appName) |> Async.AwaitTask 
             let! app =  stream.FirstOrDefaultAsync() |> Async.AwaitTask
             match box app with
             | null -> return None
             | _ -> return Some app.App
         }
 
-    let registerApp constr (app:Domain.App) = 
+    let createApp constr (app:Domain.App) = 
         async {
             let col = getCollection<MongoApp> constr "App"
             let mongoApp = {Id = ObjectId.GenerateNewId() ; App = app}
-            do! col.InsertOneAsync(mongoApp) |> Async.AwaitTask
+            do! col.DeleteOneAsync(fun a -> a.App.Name = app.Name) |> Async.AwaitTask |> Async.Ignore
+            do! col.InsertOneAsync(mongoApp) |> Async.AwaitTask |> Async.Ignore
             let! stream = col.FindAsync(fun a -> a.App.Name = app.Name) |> Async.AwaitTask 
-            let! foundApp =  stream.FirstAsync() |> Async.AwaitTask
-            return foundApp.App
+            let! newApp =  stream.FirstAsync() |> Async.AwaitTask
+            return newApp.App
+        }
+
+    let expireToken constr appName = 
+        async {
+            let col = getCollection<MongoApp> constr "App"
+            let! stream = col.FindAsync(fun a-> a.App.Name = appName) |> Async.AwaitTask
+            let! app = stream.FirstOrDefaultAsync() |> Async.AwaitTask
+            match box app with
+            | null -> return None
+            | _ -> let newMongoApp = {app with App = {app.App with SecretToken = None}}
+                   do! col.DeleteOneAsync(fun a -> a.App.Name = appName) |> Async.AwaitTask |> Async.Ignore
+                   do! col.InsertOneAsync(newMongoApp) |> Async.AwaitTask |> Async.Ignore
+                   return Some true
         }
 
 

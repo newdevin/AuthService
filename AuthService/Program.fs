@@ -13,8 +13,7 @@ open Microsoft.Extensions.DependencyInjection
 
 let app = application {
    
-    url "https://0.0.0.0:8085/" 
-    force_ssl
+    url "http://0.0.0.0:8085/" 
     use_router Router.apiRouter
     service_config (fun services -> services.AddSingleton<Giraffe.Serialization.Json.IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer()))
     host_config (fun builder ->
