@@ -1,0 +1,11 @@
+docker build -t imagename .
+docker run -p 8085:8085 imagename -rm
+-rm will remove the container program exists
+docker ps --tolist running containers
+
+stop all running images
+sudo docker stop $(sudo docker ps -aq)
+
+
+get the ip address of docker container. Needed for linux as localhost does not work
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' myContainerID
