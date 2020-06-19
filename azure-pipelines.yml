@@ -30,9 +30,9 @@ steps:
 
 - task: VSTest@2
   inputs:
-    command: test
-    projects: '**/*Test*/.fsproj'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-    
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\*test*.dll
+      !**\*TestAdapter.dll
+      !**\obj\**
+    searchFolder: '$(System.DefaultWorkingDirectory)'
