@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		DockerFile = DockerFile
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AuthService.Test", "AuthService.Test\AuthService.Test.fsproj", "{A3C94C7D-0E65-4B01-8484-F9DCE7A47B51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8F4B38A2-6E33-4DBE-8629-0B47651FEF09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F4B38A2-6E33-4DBE-8629-0B47651FEF09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F4B38A2-6E33-4DBE-8629-0B47651FEF09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3C94C7D-0E65-4B01-8484-F9DCE7A47B51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3C94C7D-0E65-4B01-8484-F9DCE7A47B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3C94C7D-0E65-4B01-8484-F9DCE7A47B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3C94C7D-0E65-4B01-8484-F9DCE7A47B51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

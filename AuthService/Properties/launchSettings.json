@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "AuthService": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "dbConnectionString": "https://dev-stock-db.documents.azure.com:443/",
+        "port": "8086"
+      }
+    }
+  }
+}
