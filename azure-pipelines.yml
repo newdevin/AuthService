@@ -36,3 +36,5 @@ steps:
       **\*.Test.dll
       !**\*TestAdapter.dll
       !**\obj\**
+      runInParallel: true
+
