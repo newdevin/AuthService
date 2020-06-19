@@ -17,8 +17,7 @@ steps:
   inputs:
     command: test
     projects: '**/*.Test.fsproj'
-    arguments: $(buildCongifuration)
-    runInParallel: true
+    arguments: '--configuration $(buildCongifuration)'
 
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
